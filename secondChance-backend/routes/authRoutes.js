@@ -19,9 +19,7 @@ router.post('/register', async (req, res) => {
     try {
       //Connect to `secondChance` in MongoDB through `connectToDatabase` in `db.js`.
       const db = await connectToDatabase();
-      //Access the `users` collection
       const collection = db.collection("users");
-      //Check for existing email in DB
       const existingEmail = await collection.findOne({ email: req.body.email });
         if (existingEmail) {
             logger.error('Email id already exists');
@@ -30,7 +28,6 @@ router.post('/register', async (req, res) => {
         const salt = await bcryptjs.genSalt(10);
         const hash = await bcryptjs.hash(req.body.password, salt);
         const email=req.body.email;
-        //Save user details
         const newUser = await collection.insertOne({
             email: req.body.email,
             firstName: req.body.firstName,
@@ -43,7 +40,6 @@ router.post('/register', async (req, res) => {
                 id: newUser.insertedId,
             },
         };
-        //Create JWT
         const authtoken = jwt.sign(payload, JWT_SECRET);
         logger.info('User registered successfully');
         res.json({ authtoken,email });
